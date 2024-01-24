@@ -115,7 +115,7 @@ async function replaceGroup(oldTag, newTag, apiKey) {
     }
 
     if (markets.length < 400) {
-      document.getElementById("...").parentNode.replaceChild(createTableRow("...", "...", "...", "Finished"), document.getElementById("..."))
+      document.getElementById("...").parentNode.replaceChild(createTableRow("...", "...", "...", "Finished"), document.getElementById("..."));
       console.log("Finished migrating markets!");
       migrationFinished = true;
       break;
