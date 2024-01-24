@@ -128,17 +128,3 @@ async function replaceGroup(oldTag, newTag, apiKey) {
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
-
-function replaceGroups() {
-  const apiKey = document.getElementById("apiKey").value;
-  const oldGroupSlug = document.getElementById("oldGroupSlug").value;
-  const newGroupSlug = document.getElementById("newGroupSlug").value;
-
-  replaceGroup(oldGroupSlug, newGroupSlug, apiKey)
-    .then(() => {
-      console.log("Groups replaced successfully!");
-    })
-    .catch(error => {
-      console.error("An error occurred while replacing groups:", error);
-    });
-}
