@@ -89,6 +89,7 @@ async function replaceGroup(oldTag, newTag, apiKey) {
 
     const tasks = [];
     for (const market of markets) {
+      tableBody.appendChild(createTableRow(market.id, market.question, market.url, 'In Progress...'));
       tasks.push(
         groupMarket(market.id, newGroupId, false, apiKey)
           .catch(() => { /* Ignore errors */ })
