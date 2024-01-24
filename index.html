@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Market ID Table</title>
+  <script src="script.js"></script>
+</head>
+<body>
+  <h1>Market ID Table</h1>
+  <div>
+    <label for="old-group-input">Old Group Slug:</label>
+    <input type="text" id="old-group-input">
+  </div>
+  <div>
+    <label for="new-group-input">New Group Slug:</label>
+    <input type="text" id="new-group-input">
+  </div>
+  <div>
+    <label for="api-key-input">API Key:</label>
+    <input type="text" id="api-key-input">
+  </div>
+  <div>
+    <button id="update-button">Update Table</button>
+  </div>
+  <table id="market-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Question</th>
+        <th>URL</th>
+        <th>Updated</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+  <script>
+    // Function to update the table with market information
+    function updateMarketTable(marketInfo) {
+      var tbody = document.querySelector('#market-table tbody');
+      tbody.innerHTML = '';
+
+      marketInfo.forEach(function(market) {
+        var row = document.createElement('tr');
+        var idCell = document.createElement('td');
+        idCell.textContent = market.id;
+        row.appendChild(idCell);
+        var questionCell = document.createElement('td');
+        questionCell.textContent = market.question;
+        row.appendChild(questionCell);
+        var urlCell = document.createElement('td');
+        urlCell.textContent = market.url;
+        row.appendChild(urlCell);
+        var updatedCell = document.createElement('td');
+        updatedCell.textContent = market.updated;
+        row.appendChild(updatedCell);
+
+        tbody.appendChild(row);
+      });
+    }
+
+    // Function to handle the button click event
+    function handleUpdateButtonClick() {
+      var oldGroup = document.querySelector('#old-group-input').value;
+      var newGroup = document.querySelector('#new-group-input').value;
+      var apiKey = document.querySelector('#api-key-input').value;
+
+      replaceGroup(oldGroup, newGroup, apiKey)
+        .then(function(marketInfo) {
+          updateMarketTable(marketInfo);
+        })
+        .catch(function(error) {
+          console.error('An error occurred:', error);
+        });
+    }
+
+    // Attach the event listener to the button
+    document.querySelector('#update-button').addEventListener('click', handleUpdateButtonClick);
+  </script>
+</body>
+</html>
