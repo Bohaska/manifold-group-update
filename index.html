@@ -63,6 +63,12 @@
       var oldGroup = document.querySelector('#old-group-input').value;
       var newGroup = document.querySelector('#new-group-input').value;
       var apiKey = document.querySelector('#api-key-input').value;
+      
+      // Clear all rows from the table
+      var tableBody = document.getElementById('market-table-body');
+      while (tableBody.firstChild) {
+        tableBody.removeChild(tableBody.firstChild);
+      }
 
       replaceGroup(oldGroup, newGroup, apiKey)
         .then(function(marketInfo) {
