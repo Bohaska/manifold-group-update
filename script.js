@@ -76,11 +76,12 @@ async function replaceGroup(oldTag, newTag, apiKey) {
   const oldGroupId = oldGroup.id;
   const newGroupId = newGroup.id;
 
+  const tableBody = document.getElementById('market-table-body');
+  const progressRow = createTableRow('...', '...', '...', 'In Progress...');
+  tableBody.appendChild(progressRow);
+
   let migrationFinished = false;
   let before = null;
-
-  // Create an array to store the market information
-  const marketInfo = [];
 
   while (!migrationFinished) {
     const markets = await searchMarkets(400, oldGroupId, before, apiKey);
@@ -88,27 +89,28 @@ async function replaceGroup(oldTag, newTag, apiKey) {
 
     const tasks = [];
     for (const market of markets) {
-      tasks.push(groupMarket(market.id, newGroupId, false, apiKey));
-      tasks.push(groupMarket(market.id, oldGroupId, true, apiKey));
+      tasks.push(
+        groupMarket(market.id, newGroupId, false, apiKey)
+          .catch(() => { /* Ignore errors */ })
+      );
+      tasks.push(
+        groupMarket(market.id, oldGroupId, true, apiKey)
+          .catch(() => { /* Ignore errors */ })
+      );
     }
 
     await Promise.all(tasks);
 
-    // Check if the market has been updated with its groups
-    const updatedMarkets = await searchMarkets(400, newGroupId, before, apiKey);
-    const updatedMarketIds = updatedMarkets.map(market => market.id);
-
     for (const market of markets) {
       // Check if the market has been updated
-      const isUpdated = updatedMarketIds.includes(market.id);
+      const isUpdated = tasks.some(task => task.marketId === market.id && task.status === 'fulfilled');
 
-      // Store the market information in the array
-      marketInfo.push({
-        id: market.id,
-        question: market.question,
-        url: market.url,
-        updated: isUpdated ? 'Yes' : 'No'
-      });
+      // Create a new row with market information
+      const newRow = createTableRow(market.id, market.question, market.url, isUpdated ? 'Yes' : 'No');
+
+      // Replace the existing row with the new row
+      const existingRow = document.getElementById(market.id);
+      existingRow.parentNode.replaceChild(newRow, existingRow);
     }
 
     if (markets.length < 400) {
@@ -120,9 +122,27 @@ async function replaceGroup(oldTag, newTag, apiKey) {
     console.log("Sleeping for 60 seconds...");
     await sleep(60000);
   }
-  
-  // Output the table of market information
-  console.table(marketInfo, ['id', 'question', 'url', 'updated']);
+
+  // Update the progress row with the final status
+  progressRow.cells[3].textContent = marketInfo.length > 1 ? (marketInfo[marketInfo.length - 1].updated === 'Yes' ? 'Yes' : 'Failed') : 'No';
+}
+
+function createTableRow(id, question, url, updated) {
+  const row = document.createElement('tr');
+  row.id = id;
+  const idCell = document.createElement('td');
+  idCell.textContent = id;
+  const questionCell = document.createElement('td');
+  questionCell.textContent = question;
+  const urlCell = document.createElement('td');
+  urlCell.textContent = url;
+  const updatedCell = document.createElement('td');
+  updatedCell.textContent = updated;
+  row.appendChild(idCell);
+  row.appendChild(questionCell);
+  row.appendChild(urlCell);
+  row.appendChild(updatedCell);
+  return row;
 }
 
 function sleep(ms) {
